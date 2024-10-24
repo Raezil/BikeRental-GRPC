@@ -14,8 +14,15 @@ type RentalServer struct {
 }
 
 func (server *RentalServer) CreateRental(ctx context.Context, req *CreateRentalRequest) (*Rental, error) {
+	email, err := CurrentUser(ctx)
+	user, err := server.PrismaClient.User.FindUnique(
+		db.User.Email.Equals(email),
+	).Exec(ctx)
+	if err != nil {
+		return nil, err
+	}
 	result, err := server.PrismaClient.Rental.CreateOne(
-		db.Rental.User.Link(db.User.ID.Equals(int(req.UserId))),
+		db.Rental.User.Link(db.User.ID.Equals(int(user.ID))),
 		db.Rental.Bike.Link(db.Bike.ID.Equals(int(req.BikeId))),
 	).Exec(ctx)
 	if err != nil {
@@ -27,6 +34,7 @@ func (server *RentalServer) CreateRental(ctx context.Context, req *CreateRentalR
 		Id:     int32(result.ID),
 		UserId: int32(result.UserID),
 		BikeId: int32(result.BikeID),
+		Status: "Ongoing",
 		// Add other fields as needed
 	}
 
@@ -63,8 +71,16 @@ func (server *RentalServer) DeleteRental(ctx context.Context, req *DeleteRentalR
 }
 
 func (server *RentalServer) UpdateRental(ctx context.Context, req *UpdateRentalRequest) (*Rental, error) {
+	email, err := CurrentUser(ctx)
+	user, err := server.PrismaClient.User.FindUnique(
+		db.User.Email.Equals(email),
+	).Exec(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	result, err := server.PrismaClient.Rental.FindUnique(
-		db.Rental.ID.Equals(int(req.Id)),
+		db.Rental.ID.Equals(user.ID),
 	).Update(
 		db.Rental.Status.Set(req.Status),
 		db.Rental.EndTime.Set(req.EndTime.AsTime()),
@@ -79,6 +95,7 @@ func (server *RentalServer) UpdateRental(ctx context.Context, req *UpdateRentalR
 		UserId:  int32(result.UserID),
 		BikeId:  int32(result.BikeID),
 		EndTime: timestamppb.New(time),
+		Status:  result.Status,
 		// Add other fields as needed
 	}, nil
 }

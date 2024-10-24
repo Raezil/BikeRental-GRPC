@@ -1,6 +1,6 @@
 datasource db {
-  provider = "postgresql"
-  url      = "postgres://postgres:postgres@localhost:5432/Future?sslmode=disable"// Update with your PostgreSQL connection string
+  provider = "sqlite" // or "postgresql", "mysql", etc.
+  url      = "file:dev.db"
 }
 
 generator db {

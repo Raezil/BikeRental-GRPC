@@ -38,7 +38,7 @@ func (server *BikeServer) CreateBike(ctx context.Context, req *CreateBikeRequest
 	}, nil
 }
 
-func (server *BikeServer) Update(ctx context.Context, req *UpdateBikeRequest) (*Bike, error) {
+func (server *BikeServer) UpdateBike(ctx context.Context, req *UpdateBikeRequest) (*Bike, error) {
 	rental, err := server.PrismaClient.Bike.FindUnique(
 		db.Bike.ID.Equals(int(req.Id)),
 	).Update(

@@ -65,8 +65,7 @@ message DeletedBikeResponse {
 
 // Rental Operations
 message CreateRentalRequest {
-  int32 user_id = 1;
-  int32 bike_id = 2;
+  int32 bike_id = 1;
 }
 
 message GetRentalRequest {
@@ -75,7 +74,6 @@ message GetRentalRequest {
 
 message UpdateRentalRequest {
   int32 id = 1;
-  int32 user_id = 2;
   int32 bike_id = 3;
   google.protobuf.Timestamp end_time = 4;
   string status = 5;
