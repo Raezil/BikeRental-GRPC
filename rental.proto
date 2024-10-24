@@ -1,0 +1,173 @@
+syntax = "proto3";
+
+package bikerental;
+
+option go_package = "github.com/yourusername/bike-rental-backend/bikerentalpb";
+
+// Import for timestamp fields
+import "google/api/annotations.proto";
+
+import "google/protobuf/timestamp.proto";
+
+message Bike {
+  int32 id = 1;
+  string model = 2;
+  string status = 3;
+  google.protobuf.Timestamp created_at = 4;
+  google.protobuf.Timestamp updated_at = 5;
+}
+
+message Rental {
+  int32 id = 1;
+  int32 user_id = 2;
+  int32 bike_id = 3;
+  google.protobuf.Timestamp start_time = 4;
+  google.protobuf.Timestamp end_time = 5;
+  string status = 6;
+}
+
+message DeletedRentalResponse {
+    string message = 1;
+}
+
+
+// Bike Operations
+message CreateBikeRequest {
+  string model = 1;
+  string status = 2;
+}
+
+message GetBikeRequest {
+  int32 id = 1;
+}
+
+message UpdateBikeRequest {
+  int32 id = 1;
+  string model = 2;
+  string status = 3;
+}
+
+message DeleteBikeRequest {
+  int32 id = 1;
+}
+
+message ListBikesRequest {
+  int32 page = 1;
+  int32 page_size = 2;
+}
+
+message ListBikesResponse {
+  repeated Bike bikes = 1;
+}
+message DeletedBikeResponse {
+    string messsage = 1;
+}
+
+// Rental Operations
+message CreateRentalRequest {
+  int32 user_id = 1;
+  int32 bike_id = 2;
+}
+
+message GetRentalRequest {
+  int32 id = 1;
+}
+
+message UpdateRentalRequest {
+  int32 id = 1;
+  int32 user_id = 2;
+  int32 bike_id = 3;
+  google.protobuf.Timestamp end_time = 4;
+  string status = 5;
+}
+
+message DeleteRentalRequest {
+  int32 id = 1;
+}
+
+message ListRentalsRequest {
+  int32 page = 1;
+  int32 page_size = 2;
+}
+
+message ListRentalsResponse {
+  repeated Rental rentals = 1;
+}
+
+service BikeService {
+  // Create a new bike
+  rpc CreateBike(CreateBikeRequest) returns (Bike) {
+    option (google.api.http) = {
+      post: "/v1/bikes"
+      body: "*"
+    };
+  }
+
+  // Get a bike by ID
+  rpc GetBike(GetBikeRequest) returns (Bike) {
+    option (google.api.http) = {
+      get: "/v1/bikes/{id}"
+    };
+  }
+
+  // Update a bike
+  rpc UpdateBike(UpdateBikeRequest) returns (Bike) {
+    option (google.api.http) = {
+      put: "/v1/bikes/{id}"
+      body: "*"
+    };
+  }
+
+  // Delete a bike
+  rpc DeleteBike(DeleteBikeRequest) returns (DeletedBikeResponse) {
+    option (google.api.http) = {
+      delete: "/v1/bikes/{id}"
+    };
+  }
+
+  // List bikes with pagination
+  rpc ListBikes(ListBikesRequest) returns (ListBikesResponse) {
+    option (google.api.http) = {
+      get: "/v1/bikes"
+    };
+  }
+}
+
+service RentalService {
+  // Create a new rental
+  rpc CreateRental(CreateRentalRequest) returns (Rental) {
+    option (google.api.http) = {
+      post: "/v1/rentals"
+      body: "*"
+    };
+  }
+
+  // Get a rental by ID
+  rpc GetRental(GetRentalRequest) returns (Rental) {
+    option (google.api.http) = {
+      get: "/v1/rentals/{id}"
+    };
+  }
+
+  // Update a rental
+  rpc UpdateRental(UpdateRentalRequest) returns (Rental) {
+    option (google.api.http) = {
+      put: "/v1/rentals/{id}"
+      body: "*"
+    };
+  }
+
+  // Delete a rental
+  rpc DeleteRental(DeleteRentalRequest) returns (DeletedRentalResponse) {
+    option (google.api.http) = {
+      delete: "/v1/rentals/{id}"
+    };
+  }
+
+  // List rentals with pagination
+  rpc ListRentals(ListRentalsRequest) returns (ListRentalsResponse) {
+    option (google.api.http) = {
+      get: "/v1/rentals"
+    };
+  }
+}
