@@ -1,0 +1,38 @@
+datasource db {
+  provider = "postgresql"
+  url      = "postgres://postgres:postgres@localhost:5432/Future?sslmode=disable"// Update with your PostgreSQL connection string
+}
+
+generator db {
+  provider = "go run github.com/steebchen/prisma-client-go"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String?
+  password String
+  rentals   Rental[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Bike {
+  id          Int          @id @default(autoincrement())
+  model       String
+  status      String   @default("AVAILABLE")
+  rentals     Rental[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Rental {
+  id        Int           @id @default(autoincrement())
+  userId    Int
+  user      User          @relation(fields: [userId], references: [id])
+  bikeId    Int
+  bike      Bike          @relation(fields: [bikeId], references: [id])
+  startTime DateTime      @default(now())
+  endTime   DateTime?
+  status      String   @default("ONGOING")
+}
