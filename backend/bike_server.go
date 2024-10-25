@@ -11,6 +11,10 @@ type BikeServer struct {
 	PrismaClient *db.PrismaClient
 }
 
+/*
+	curl -X GET http://localhost:8080/v1/bikes/1 \
+	  -H 'Authorization: $TOKEN'
+*/
 func (server *BikeServer) GetBike(ctx context.Context, req *GetBikeRequest) (*Bike, error) {
 	rental, err := server.PrismaClient.Bike.FindUnique(
 		db.Bike.ID.Equals(int(req.Id)),
@@ -25,6 +29,15 @@ func (server *BikeServer) GetBike(ctx context.Context, req *GetBikeRequest) (*Bi
 	}, nil
 }
 
+/*
+	curl -X POST http://localhost:8080/v1/bikes \
+	  -H 'Content-Type: application/json' \
+	  -H 'Authorization: $TOKEN' \
+	  -d '{
+	        "model": "Mountain Bike",
+	        "status": "available"
+	      }'
+*/
 func (server *BikeServer) CreateBike(ctx context.Context, req *CreateBikeRequest) (*Bike, error) {
 	rental, err := server.PrismaClient.Bike.CreateOne(
 		db.Bike.Model.Set(req.Model),
@@ -34,10 +47,21 @@ func (server *BikeServer) CreateBike(ctx context.Context, req *CreateBikeRequest
 		return nil, err
 	}
 	return &Bike{
-		Id: int32(rental.ID),
+		Id:     int32(rental.ID),
+		Model:  rental.Model,
+		Status: rental.Status,
 	}, nil
 }
 
+/*
+	curl -X PUT http://localhost:8080/v1/bikes/1 \
+	  -H 'Content-Type: application/json' \
+	  -H 'Authorization: $TOKEN' \
+	  -d '{
+	        "model": "Road Bike",
+	        "status": "in_service"
+	      }'
+*/
 func (server *BikeServer) UpdateBike(ctx context.Context, req *UpdateBikeRequest) (*Bike, error) {
 	rental, err := server.PrismaClient.Bike.FindUnique(
 		db.Bike.ID.Equals(int(req.Id)),
@@ -55,6 +79,10 @@ func (server *BikeServer) UpdateBike(ctx context.Context, req *UpdateBikeRequest
 	}, nil
 }
 
+/*
+	curl -X DELETE http://localhost:8080/v1/bikes/1 \
+	  -H 'Authorization: $TOKEN'
+*/
 func (server *BikeServer) DeleteBike(ctx context.Context, req *DeleteBikeRequest) (*DeletedBikeResponse, error) {
 	rental, err := server.PrismaClient.Bike.FindUnique(
 		db.Bike.ID.Equals(int(req.Id)),
@@ -68,6 +96,10 @@ func (server *BikeServer) DeleteBike(ctx context.Context, req *DeleteBikeRequest
 	}, nil
 }
 
+/*
+	curl -X GET 'http://localhost:8080/v1/bikes?page=1&page_size=10' \
+	  -H 'Authorization: $TOKEN'
+*/
 func (server *BikeServer) ListBikes(ctx context.Context, req *ListBikesRequest) (*ListBikesResponse, error) {
 	selected, err := server.PrismaClient.Bike.FindMany().Take(int(req.PageSize)).Skip((int(req.Page) - 1) * int(req.PageSize)).Exec(ctx)
 	if err != nil {

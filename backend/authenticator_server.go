@@ -23,6 +23,14 @@ func CurrentUser(ctx context.Context) (string, error) {
 	return current_user[0], nil
 }
 
+/*
+	curl -X POST http://localhost:8080/v1/auth/protected \
+	  -H 'Content-Type: application/json' \
+	  -H 'Authorization: $TOKEN \
+	  -d '{
+	        "text": "Sample text message"
+	      }'
+*/
 func (s *AuthenticatorServer) SampleProtected(ctx context.Context, in *ProtectedRequest) (*ProtectedReply, error) {
 	currentUser, err := CurrentUser(ctx)
 	if err != nil {
@@ -33,6 +41,14 @@ func (s *AuthenticatorServer) SampleProtected(ctx context.Context, in *Protected
 	}, nil
 }
 
+/*
+	curl -X POST http://localhost:8080/v1/auth/login \
+	  -H 'Content-Type: application/json' \
+	  -d '{
+	        "email": "newuser@example.com",
+	        "password": "password"
+	      }'
+*/
 func (s *AuthenticatorServer) Login(ctx context.Context, in *LoginRequest) (*LoginReply, error) {
 	log.Println("Login attempt for email:", in.Email)
 
@@ -63,6 +79,17 @@ func (s *AuthenticatorServer) Login(ctx context.Context, in *LoginRequest) (*Log
 	}, nil
 }
 
+/*
+	curl -X POST http://localhost:8080/v1/auth/register \
+	  -H 'Content-Type: application/json' \
+	  -d '{
+	        "email": "newuser@example.com",
+	        "password": "password",
+	        "name": "John",
+	        "surname": "Doe",
+	        "age": 30
+	      }'
+*/
 func (s *AuthenticatorServer) Register(ctx context.Context, in *RegisterRequest) (*RegisterReply, error) {
 	obj, err := s.PrismaClient.User.CreateOne(
 		db.User.Email.Set(in.Email),

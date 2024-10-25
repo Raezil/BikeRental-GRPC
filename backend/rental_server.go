@@ -13,8 +13,19 @@ type RentalServer struct {
 	PrismaClient *db.PrismaClient
 }
 
+/*
+	curl -X POST http://localhost:8080/v1/rentals \
+	  -H 'Content-Type: application/json' \
+	  -H 'Authorization: $TOKEN' \
+	  -d '{
+	        "bike_id": 1
+	      }'
+*/
 func (server *RentalServer) CreateRental(ctx context.Context, req *CreateRentalRequest) (*Rental, error) {
 	email, err := CurrentUser(ctx)
+	if err != nil {
+		return nil, err
+	}
 	user, err := server.PrismaClient.User.FindUnique(
 		db.User.Email.Equals(email),
 	).Exec(ctx)
@@ -41,6 +52,10 @@ func (server *RentalServer) CreateRental(ctx context.Context, req *CreateRentalR
 	return rental, nil
 }
 
+/*
+	curl -X GET http://localhost:8080/v1/rentals/1 \
+	  -H 'Authorization: $TOKEN'
+*/
 func (server *RentalServer) GetRental(ctx context.Context, req *GetRentalRequest) (*Rental, error) {
 	result, err := server.PrismaClient.Rental.FindUnique(
 		db.Rental.ID.Equals(int(req.Id)),
@@ -57,6 +72,10 @@ func (server *RentalServer) GetRental(ctx context.Context, req *GetRentalRequest
 	}, nil
 }
 
+/*
+	curl -X DELETE http://localhost:8080/v1/rentals/1 \
+	  -H 'Authorization: $TOKEN'
+*/
 func (server *RentalServer) DeleteRental(ctx context.Context, req *DeleteRentalRequest) (*DeletedRentalResponse, error) {
 	rental, err := server.PrismaClient.Rental.FindUnique(
 		db.Rental.ID.Equals(int(req.Id)),
@@ -70,6 +89,16 @@ func (server *RentalServer) DeleteRental(ctx context.Context, req *DeleteRentalR
 	}, nil
 }
 
+/*
+	curl -X PUT http://localhost:8080/v1/rentals/1 \
+	  -H 'Content-Type: application/json' \
+	  -H 'Authorization: $TOKEN' \
+	  -d '{
+	        "bike_id": 2,
+	        "end_time": "2023-10-01T15:30:00Z",
+	        "status": "completed"
+	      }'
+*/
 func (server *RentalServer) UpdateRental(ctx context.Context, req *UpdateRentalRequest) (*Rental, error) {
 	email, err := CurrentUser(ctx)
 	user, err := server.PrismaClient.User.FindUnique(
@@ -100,6 +129,10 @@ func (server *RentalServer) UpdateRental(ctx context.Context, req *UpdateRentalR
 	}, nil
 }
 
+/*
+	curl -X GET 'http://localhost:8080/v1/rentals?page=1&page_size=10' \
+	  -H 'Authorization: $TOKEN'
+*/
 func (server *RentalServer) ListRentals(ctx context.Context, req *ListRentalsRequest) (*ListRentalsResponse, error) {
 	selected, err := server.PrismaClient.Rental.FindMany().Take(int(req.PageSize)).Skip((int(req.Page) - 1) * int(req.PageSize)).Exec(ctx)
 	if err != nil {

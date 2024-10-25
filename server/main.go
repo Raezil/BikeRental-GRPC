@@ -24,6 +24,7 @@ func authUnaryInterceptor(ctx context.Context, req interface{}, info *grpc.Unary
 		return nil, fmt.Errorf("missing metadata")
 	}
 	token := md["authorization"]
+
 	if len(token) == 0 {
 		return nil, fmt.Errorf("missing token")
 	}
