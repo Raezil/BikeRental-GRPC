@@ -112,6 +112,7 @@ func (server *RentalServer) ListRentals(ctx context.Context, req *ListRentalsReq
 			Id:      int32(rental.ID),
 			UserId:  int32(rental.UserID),
 			BikeId:  int32(rental.BikeID),
+			Status:  rental.Status,
 			EndTime: timestamppb.New(end),
 		})
 	}

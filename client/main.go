@@ -79,4 +79,21 @@ func main() {
 	}
 	fmt.Println(rentalUpdateReply)
 
+	rentalUpdateReply, err = rentalClient.UpdateRental(ctx, &UpdateRentalRequest{
+		Id:      rentalReply.Id,
+		BikeId:  rentalReply.BikeId,
+		EndTime: timestamppb.New(time.Now()),
+		Status:  "Canceled",
+	})
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(rentalUpdateReply)
+
+	listRentalsReply, err := rentalClient.ListRentals(ctx, &ListRentalsRequest{
+		Page:     1,
+		PageSize: 6,
+	})
+	fmt.Println(listRentalsReply)
+
 }
