@@ -94,6 +94,8 @@ func (s *AuthenticatorServer) Register(ctx context.Context, in *RegisterRequest)
 	obj, err := s.PrismaClient.User.CreateOne(
 		db.User.Email.Set(in.Email),
 		db.User.Password.Set(in.Password),
+		db.User.Surname.Set(in.Surname),
+		db.User.Age.Set(int(in.Age)),
 		db.User.Name.Set(in.Name),
 	).Exec(ctx)
 

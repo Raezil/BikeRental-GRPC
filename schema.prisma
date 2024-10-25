@@ -12,6 +12,8 @@ model User {
   email     String   @unique
   name      String?
   password String
+  surname String
+  age Int
   rentals   Rental[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
