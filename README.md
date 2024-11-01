@@ -2,11 +2,30 @@
 
 Sample biking rental service using grpc.
 
-## Run Docker
+## Kubernetes
+
+### Run Docker
 ```
-docker build -t app8:latest .
-docker run -d -p 50051:50051 -p 8080:8080 --name app8 app8:latest
+docker build -t app:latest .
+docker login
+docker push $docker_username/app:latest
 ```
+
+- Apply kubectl
+```
+minikube start
+cd k8s
+kubectl apply -f deployment.yaml
+kubectl apply -f service.yaml
+```
+- Port Foward
+```
+kubectl port-forward service/app-service 8080:8080 -n default
+```
+- Check pods
+```
+kubectl get pods -n default
+kubectl describe pod $NAME -n default
 
 ## Sample curl requests
 Register:
